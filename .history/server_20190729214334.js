@@ -17,34 +17,30 @@ const db = knex({
 
 const app = express();
 
-// const whitelist = ["http://localhost:3001"];
-// const corsOptions = {
-//   origin: function(origin, callback) {
-//     if (whitelist.indexOf(origin) !== -1) {
-//       callback(null, true);
-//     } else {
-//       callback(new Error("Not allowed by CORS"));
-//     }
-//   }
-// };
+const whitelist = ["http://localhost:3001"];
+const corsOptions = {
+  origin: function(origin, callback) {
+    if (whitelist.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  }
+};
 
 app.use(morgan("combined"));
-app.use(cors());
-// app.use(cors(corsOptions));
+app.use(cors(corsOptions));
 app.use(bodyParser.json());
 
 app.get("/", (req, res) => {
   res.send(db.users);
 });
-app.post("/signin", signin.signinAuthentication(db, bcrypt));
+app.post("/signin", signin.handleSignin(db, bcrypt));
 app.post("/register", (req, res) => {
   register.handleRegister(req, res, db, bcrypt);
 });
 app.get("/profile/:id", (req, res) => {
   profile.handleProfileGet(req, res, db);
-});
-app.post("/profile/:id", (req, res) => {
-  profile.handleProfileUpdate(req, res, db);
 });
 app.put("/image", (req, res) => {
   image.handleImage(req, res, db);
